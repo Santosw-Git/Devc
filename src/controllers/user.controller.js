@@ -238,6 +238,30 @@ const getCurrentUser = asyncHandler(async(req,res) => {
         "User fetched successfully"
         ))
 })
+
+const updateAccountDetails = asyncHandler(async(req,res) => {
+
+    const {email,fullName} = req.body
+
+    if(!(email || fullName)){
+        throw new ApiError(400, "Email or Full name is required")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set : {
+                email:email,
+                fullName:fullName,
+            }
+        },
+        {new : true}
+    ).select("-password")
+
+    return res.status(200).
+    json(new ApiResponse(200 , user , "Account details updated successfully"))
+})
+
 export {
     registerUser,
     loginUser,
