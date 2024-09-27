@@ -411,4 +411,7 @@ export {
     changeCurrentPassword,
     getCurrentUser,
     updateAccountDetails,
+    updateUserAvatar,
+    updateUserCoverImage,
+    getUserChannelProfile
 }
