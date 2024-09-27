@@ -326,7 +326,7 @@ const updateUserCoverImage = asyncHandler(async(req,res) => {
 
 })
 
-cconst getUserChannelProfile = asyncHandler(async (req, res) => {
+const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { userName } = req.params;
 
   if (!userName?.trim()) {
@@ -355,11 +355,49 @@ cconst getUserChannelProfile = asyncHandler(async (req, res) => {
             as : "subscribedTo"
         }
 
-
-        },
-
     },
+    {
+    $addFields: {
+        subscriberCount: {
+            $size: "$subscriber"
+        },
+        channelSubscribedCount: {
+            $size: "$subscribedTo"
+        },
+        isSubscribed: {
+            $cond : {
+                if: {$in: [req.user._id, "$subscriber.subscriber"]},
+                then : true,
+                else : false,
+            }
+
+        }
+    }
+    },
+    {
+        $project : {
+            userName : 1,
+            fullName : 1,
+            email : 1,
+            avatar : 1,
+            subscriberCount : 1,
+            channelSubscribedCount : 1,
+            isSubscribed : 1,
+            coverImage : 1
+        }
+    }
+
   ]);
+
+  if (!channel?.length) {
+    throw new ApiError(404, "Channel not found");
+  }
+
+  return res.status(200).
+  json(new ApiResponse(
+    200,
+    channel[0],
+    "Channel fetched successfully"));
 
   
 });
