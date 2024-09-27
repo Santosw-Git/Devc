@@ -262,6 +262,70 @@ const updateAccountDetails = asyncHandler(async(req,res) => {
     json(new ApiResponse(200 , user , "Account details updated successfully"))
 })
 
+const updateUserAvatar = asyncHandler(async(req,res) => {
+    
+    const avatarLocalPath =req.file?.path
+
+    if(!avatarLocalPath){
+        throw new ApiError(400 , "AvatarLocalPath is not found")
+    }
+
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+    if(!avatar){
+        throw new ApiError(400 , "Error While uploading avatar in cloudinary")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set : {
+                avatar : avatar.url
+            }
+        },
+        {
+            new : true
+        }
+    ).select("-password")
+
+    return res.status(200).
+    json(new ApiResponse(200 , user , "Avatar updated successfully"))
+
+
+})
+
+const updateUserCoverImage = asyncHandler(async(req,res) => {
+    
+    const coverImageLocalPath =req.file?.path
+
+    if(!coverImageLocalPath){
+        throw new ApiError(400 , "coverImageLocalPath is not found")
+    }
+
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+
+    if(!coverImage){
+        throw new ApiError(400 , "Error While uploading coverImage in cloudinary")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set : {
+                coverImage : coverImage.url
+            }
+        },
+        {
+            new : true
+        }
+    ).select("-password")
+
+    return res.status(200).
+    json(new ApiResponse(200 , user , "coverImage updated successfully"))
+
+
+})
+
 export {
     registerUser,
     loginUser,
