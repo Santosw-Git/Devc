@@ -4,6 +4,7 @@ import {User} from "../models/user.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose";
 const generateAccessAndRefreshTokens = async (userId)=>{
     try {
 
@@ -124,14 +125,13 @@ const loginUser = asyncHandler( async (req , res)=>{
     }
 
     return res.status(200).
-    cookie("accessToken",accessToken,options).
     cookie("refreshToken",refreshToken,options).
     json(
         new ApiResponse(200,
             {
                 user : loggedInUser,
                 accessToken,
-                refreshToken
+                
             },
             "User logged in successfully")
     )
@@ -207,10 +207,14 @@ const refreshAccessToken = asyncHandler(async(req,res) => {
 })
 
 const changeCurrentPassword = asyncHandler(async(req,res) => {
+    console.log(req.body);
+    
 
     const {currentPassword , newPassword,changeCurrentPassword} = req.body
+    console.log(currentPassword,newPassword,changeCurrentPassword);
+    
 
-    if(newPassword !== changeCurrentPassword){
+    if(!(newPassword === changeCurrentPassword)){
         throw new ApiError(400,"Password doesn't match")
     }
 
@@ -328,8 +332,10 @@ const updateUserCoverImage = asyncHandler(async(req,res) => {
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { userName } = req.params;
+  console.log(userName);
+  
 
-  if (!userName?.trim()) {
+  if (!(userName?.trim())) {
     throw new ApiError(400, "userName is required");
   }
 
@@ -407,7 +413,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     const user = await User.aggregate([
         {
             $match : {
-                _id : new Mongoose.Types.ObjectId(req.user._id)
+                _id : new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
