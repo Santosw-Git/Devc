@@ -94,7 +94,7 @@ const registerUser = asyncHandler( async (req , res)=>{
 
 const loginUser = asyncHandler( async (req , res)=>{
     const {userName,email,password} = req.body;
-    console.log(userName);
+    console.log(password);
     
 
     if(!(userName || email)){
@@ -130,11 +130,13 @@ const loginUser = asyncHandler( async (req , res)=>{
 
     return res.status(200).
     cookie("refreshToken",refreshToken,options).
+    cookie("accessToken",accessToken,options).
     json(
         new ApiResponse(200,
             {
                 user : loggedInUser,
                 accessToken,
+                refreshAccessToken
                 
             },
             "User logged in successfully")

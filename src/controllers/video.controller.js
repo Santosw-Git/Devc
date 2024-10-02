@@ -17,35 +17,46 @@ const publishAVideo = asyncHandler(async (req, res) => {
        
     // TODO: get video, upload to cloudinary, create video
     const { title, description} = req.body
+    console.log(title, description);
+    
     
     if(!(title)){
         throw new ApiError(400, "Title is required")
     }
 
     const videoLocalPath = req.files?.videoFile[0]?.path
+    // console.log(videoLocalPath);
+    
 
     if(!videoLocalPath){
         throw new ApiError(400, "Video file is not found")
     }
 
     const thumbnailLocalPath = req.files?.thumbnail[0]?.path
+    // console.log(thumbnailLocalPath);
+    
 
     if(!thumbnailLocalPath){
         throw new ApiError(400, "Thumbnail is not found")
     }
 
-    const videoFileUrl = await uploadOnCloudinary(videoLocalPath)
-    const thumbnailUrl = await uploadOnCloudinary(thumbnailLocalPath)
+    const videoFile = await uploadOnCloudinary(videoLocalPath)
+    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
 
-    if(!videoFileUrl){
+    // console.log("Cloudinary: ", videoFile, thumbnail);
+    
+
+    if(!videoFile){
         throw new ApiError(500, "Something went wrong while uploading video in cloudinary")
     }
 
-    if(!thumbnailUrl){
+    if(!thumbnail){
         throw new ApiError(500, "Something went wrong while uploading thumbnail in cloudinary")
     }
 
     const user = await User.findById(req.user?._id)
+    console.log(user);
+    
 
     if(!user){
         throw new ApiError(404, "User not found")
@@ -54,12 +65,20 @@ const publishAVideo = asyncHandler(async (req, res) => {
     const video = await Video.create({
         title,
         description,
-        videoFileUrl : videoFileUrl?.url,
-        thumbnailUrl : thumbnailUrl?.url,
+        videoFile : videoFile?.url,
+        thumbnail : thumbnail?.url,
         owner : user._id,
-        // duration : duration  //still to reseach after console
 
     })
+
+    if(!video){
+        throw new ApiError(500, "Something went wrong while creating video in Database")
+    }
+
+    return res.status(200).
+    json(new ApiResponse(200, video,"Video created successfully"))
+
+
 
 
 
