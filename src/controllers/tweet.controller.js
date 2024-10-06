@@ -54,5 +54,5 @@ export {
     createTweet,
     getUserTweets,
     updateTweet,
-    deleteTweet
+    
 }
