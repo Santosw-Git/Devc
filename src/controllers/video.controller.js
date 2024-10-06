@@ -78,25 +78,36 @@ const publishAVideo = asyncHandler(async (req, res) => {
     return res.status(200).
     json(new ApiResponse(200, video,"Video created successfully"))
 
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
+     //TODO: get video by id
     const { videoId } = req.params
-    //TODO: get video by id
+    console.log(videoId);
+    
+
+    try {
+        if(!videoId){
+            throw new Error(404, "VideoId not found")
+        }
+
+        const video = await Video.findById(videoId)
+        if(!video){
+            throw new Error(404, "video not found")
+        }
+
+        // console.log(video);
+        
+
+        return res.status(200).
+        json(new ApiResponse(200, video.videoFile,"Video found successfully"))
+        
+    } catch (error) {
+        console.log("Error getting",error);
+        
+        
+    }
+   
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
